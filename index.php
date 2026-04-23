@@ -1,174 +1,296 @@
-<?php include 'includes/db.php'; ?>
+<?php
+session_start();
+include "includes/db.php";
+
+
+if (isset($_POST['login'])) {
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+
+        $user = $result->fetch_assoc();
+
+        if (password_verify($password, $user['password'])) {
+
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+
+            header("Location: dashboard.php");
+            exit();
+
+        } else {
+            $error = "Invalid password!";
+        }
+
+    } else {
+        $error = "User not found!";
+    }
+}
+
+/* ================= REGISTER (MODAL) ================= */
+if (isset($_POST['register'])) {
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if (empty($username) || empty($password)) {
+
+        $register_error = "All fields are required!";
+
+    } else {
+
+        // check duplicate user
+        $check = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
+        $check->bind_param("s", $username);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows > 0) {
+
+            $register_error = "Username already exists!";
+
+        } else {
+
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+            $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+            $stmt->bind_param("ss", $username, $hashed);
+
+            if ($stmt->execute()) {
+
+                $register_success = "Account registered successfully! You can now login.";
+
+            } else {
+                $register_error = "Registration failed!";
+            }
+        }
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lost & Found</title>
+<title>ICAS Lost & Found System</title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@300;400;600&display=swap');
 
-<!-- CSS PATH UPDATED -->
-<link rel="stylesheet" href="assets/style.css">
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0a0f2c;
+    overflow:hidden;
+    color:white;
+}
+
+/* GRID BACKGROUND */
+body::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size:50px 50px;
+    animation: move 20s linear infinite;
+    z-index:-1;
+}
+
+@keyframes move{
+    0%{transform:translate(0,0);}
+    100%{transform:translate(-50px,-50px);}
+}
+
+/* CONTAINER */
+.container{
+    width:90%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* LEFT SIDE */
+.left{
+    width:50%;
+}
+
+.left h1{
+    font-family:Orbitron;
+    color:#00e5ff;
+    font-size:38px;
+}
+
+.left p{
+    color:#aaa;
+    margin-top:10px;
+}
+
+/* LOGIN BOX */
+.box{
+    width:400px;
+    background:rgba(255,255,255,0.08);
+    padding:30px;
+    border-radius:15px;
+    backdrop-filter:blur(12px);
+    box-shadow:0 0 20px rgba(0,229,255,0.3);
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:8px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#00e5ff;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.error{
+    background:red;
+    padding:8px;
+    margin:10px 0;
+    border-radius:6px;
+    text-align:center;
+}
+
+/* MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+}
+
+.modal-content{
+    width:350px;
+    margin:10% auto;
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:12px;
+    backdrop-filter:blur(12px);
+}
+
+.close{
+    float:right;
+    cursor:pointer;
+    color:#00e5ff;
+}
+
+/* SUCCESS MESSAGE */
+.success{
+    color:#00e5ff;
+    text-align:center;
+    margin:10px 0;
+}
+</style>
+
 </head>
 
 <body>
 
 <div class="container">
-
-    <div class="header">
-        <h2>Lost & Found Items</h2>
-        <a href="#" id="openModal"><i class="fas fa-plus"></i></a>
+        
+    <!-- LEFT -->
+    <div class="left">
+        <h1>LOST AND FOUND INVENTORY SYSTEM</h1>
+        <p>ICAS - Secure Tracking System</p>
     </div>
 
-    <div class="table-container">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
+    <!-- LOGIN BOX -->
+    <div class="box">
 
-            <?php
-            $result = mysqli_query($conn, "SELECT * FROM items ORDER BY id DESC");
+        <h2>LOGIN</h2>
 
-            while($row = mysqli_fetch_assoc($result)){
-            ?>
+        <?php if(isset($error)) echo "<div class='error'>$error</div>"; ?>
 
-            <tr>
-                <td>#<?= $row['id'] ?></td>
-                <td><img src="<?= $row['image'] ?>"></td>
-                <td><?= $row['item_name'] ?></td>
-                <td><?= $row['date_found'] ?></td>
-                <td><?= $row['location'] ?></td>
-                <td><?= $row['lost_found'] ?></td>
-                <td><?= $row['status'] ?></td>
-                <td>
-                    <div class="actions">
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button name="login">Login</button>
+        </form>
 
-                        <a href="#" class="icon-btn editBtn"
-                            data-id="<?= $row['id'] ?>"
-                            data-name="<?= $row['item_name'] ?>"
-                            data-date="<?= $row['date_found'] ?>"
-                            data-location="<?= $row['location'] ?>"
-                            data-type="<?= $row['lost_found'] ?>"
-                            data-status="<?= $row['status'] ?>"
-                        >
-                            <i class="fas fa-edit"></i>
-                        </a>
+        <br>
+        <a href="#" onclick="openModal()" style="color:#00e5ff;">Create Account</a>
 
-                        <a href="delete_item.php?id=<?= $row['id'] ?>" class="icon-btn deleteBtn">
-                            <i class="fas fa-trash"></i>
-                        </a>
-
-                    </div>
-                </td>
-            </tr>
-
-            <?php } ?>
-        </table>
     </div>
+
 </div>
 
-<!-- MODAL -->
-<div id="modal" class="modal">
+<!-- REGISTER MODAL -->
+<div id="registerModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
 
-        <h3 id="modalTitle">Add Item</h3>
+        <span class="close" onclick="closeModal()">&times;</span>
 
-        <form id="itemForm" action="add_item.php" method="POST" enctype="multipart/form-data">
+        <h3 style="text-align:center;">Register</h3>
 
-            <input type="hidden" name="id" id="item_id">
+        <?php
+        if(isset($register_error)) echo "<div class='error'>$register_error</div>";
+        if(isset($register_success)) echo "<div class='success'>$register_success</div>";
+        ?>
 
-            <input type="text" name="item_name" id="item_name" placeholder="Item Name" required>
-
-            <input type="date" name="date_found" id="date_found" required>
-
-            <input type="text" name="location" id="location" placeholder="Location" required>
-
-            <select name="lost_found" id="lost_found" required>
-                <option value="">Select Type</option>
-                <option value="Lost">Lost</option>
-                <option value="Found">Found</option>
-            </select>
-
-            <select name="status" id="status" required>
-                <option value="Unclaimed">Unclaimed</option>
-                <option value="Claimed">Claimed</option>
-            </select>
-
-            <input type="file" name="image">
-
-            <button type="submit" id="submitBtn">Save</button>
-
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button name="register">Register</button>
         </form>
+
     </div>
 </div>
 
 <script>
-const modal = document.getElementById("modal");
-const form = document.getElementById("itemForm");
+function openModal(){
+    document.getElementById("registerModal").style.display="block";
+}
 
-const item_id = document.getElementById("item_id");
-const item_name = document.getElementById("item_name");
-const date_found = document.getElementById("date_found");
-const locationInput = document.getElementById("location");
-const lost_found = document.getElementById("lost_found");
-const status = document.getElementById("status");
-const modalTitle = document.getElementById("modalTitle");
-const submitBtn = document.getElementById("submitBtn");
+function closeModal(){
+    document.getElementById("registerModal").style.display="none";
+}
 
-// ADD
-document.getElementById("openModal").onclick = e => {
-    e.preventDefault();
-
-    form.reset();
-    item_id.value = "";
-
-    form.action = "add_item.php";
-    modalTitle.innerText = "Add Item";
-    submitBtn.innerText = "Save";
-
-    modal.style.display = "block";
-};
-
-// EDIT
-document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.onclick = function(e) {
-        e.preventDefault();
-
-        modal.style.display = "block";
-
-        item_id.value = this.dataset.id;
-        item_name.value = this.dataset.name;
-        date_found.value = this.dataset.date;
-        locationInput.value = this.dataset.location;
-        lost_found.value = this.dataset.type;
-        status.value = this.dataset.status;
-
-        form.action = "update_item.php";
-        modalTitle.innerText = "Edit Item";
-        submitBtn.innerText = "Update";
-    };
-});
-
-// CLOSE
-document.querySelector(".close").onclick = () => {
-    modal.style.display = "none";
-};
-
-window.onclick = e => {
-    if (e.target == modal) {
-        modal.style.display = "none";
+window.onclick = function(e){
+    let modal = document.getElementById("registerModal");
+    if(e.target == modal){
+        modal.style.display="none";
     }
-};
+}
+
+/* AUTO OPEN MODAL IF ERROR OR SUCCESS */
+<?php if(isset($register_error) || isset($register_success)): ?>
+document.getElementById("registerModal").style.display = "block";
+<?php endif; ?>
 </script>
 
 </body>

@@ -35,7 +35,7 @@ if (isset($_POST['login'])) {
     }
 }
 
-/* ================= REGISTER (MODAL) ================= */
+/* modal */
 if (isset($_POST['register'])) {
 
     $username = $_POST['username'];
@@ -220,13 +220,17 @@ button{
 </head>
 
 <body>
-
+<div style="position:absolute; top:20px; width:100%; text-align:center;">
+<h1 style="font-family:Orbitron;color:#00e5ff;">
+INABANGA COLLEGE OF ARTS AND SCIENCES (ICAS)
+</h1>
+</div>
 <div class="container">
         
     <!-- LEFT -->
     <div class="left">
         <h1>LOST AND FOUND INVENTORY SYSTEM</h1>
-        <p>ICAS - Secure Tracking System</p>
+        <p>ICAS - Lost & Found Tracking System</p>
     </div>
 
     <!-- LOGIN BOX -->
@@ -242,56 +246,9 @@ button{
             <button name="login">Login</button>
         </form>
 
-        <br>
-        <a href="#" onclick="openModal()" style="color:#00e5ff;">Create Account</a>
-
+        
+       
     </div>
 
 </div>
 
-<!-- REGISTER MODAL -->
-<div id="registerModal" class="modal">
-    <div class="modal-content">
-
-        <span class="close" onclick="closeModal()">&times;</span>
-
-        <h3 style="text-align:center;">Register</h3>
-
-        <?php
-        if(isset($register_error)) echo "<div class='error'>$register_error</div>";
-        if(isset($register_success)) echo "<div class='success'>$register_success</div>";
-        ?>
-
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button name="register">Register</button>
-        </form>
-
-    </div>
-</div>
-
-<script>
-function openModal(){
-    document.getElementById("registerModal").style.display="block";
-}
-
-function closeModal(){
-    document.getElementById("registerModal").style.display="none";
-}
-
-window.onclick = function(e){
-    let modal = document.getElementById("registerModal");
-    if(e.target == modal){
-        modal.style.display="none";
-    }
-}
-
-/* AUTO OPEN MODAL IF ERROR OR SUCCESS */
-<?php if(isset($register_error) || isset($register_success)): ?>
-document.getElementById("registerModal").style.display = "block";
-<?php endif; ?>
-</script>
-
-</body>
-</html>

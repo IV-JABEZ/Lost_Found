@@ -13,14 +13,16 @@ if(isset($_POST['item_name'])){
     $tmp = $_FILES['image']['tmp_name'];
 
     $path = "uploads/" . time() . "_" . $imageName;
-
     move_uploaded_file($tmp, $path);
 
-    mysqli_query($conn,"INSERT INTO items 
+    $stmt = $conn->prepare("INSERT INTO items 
     (item_name,date_found,location,lost_found,status,image)
-    VALUES('$name','$date','$location','$type','$status','$path')");
+    VALUES(?,?,?,?,?,?)");
 
-    header("Location: index.php");
+    $stmt->bind_param("ssssss",$name,$date,$location,$type,$status,$path);
+    $stmt->execute();
+
+    header("Location: dashboard.php");
 }
 ?>
 

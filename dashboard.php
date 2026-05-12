@@ -268,7 +268,7 @@ button{
             <td><?= $row['status'] ?></td>
             <td>
                 <div class="actions">
-                    <a href="#" class="icon-btn editBtn"><i class="fas fa-edit"></i></a>
+                    <a href="update_item.php?id=<?= $row['id'] ?>" class="icon-btn editBtn"><i class="fas fa-edit"></i></a>
                     <a href="delete_item.php?id=<?= $row['id'] ?>" class="icon-btn deleteBtn"><i class="fas fa-trash"></i></a>
                 </div>
             </td>

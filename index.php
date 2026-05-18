@@ -83,172 +83,285 @@ if (isset($_POST['register'])) {
 <title>ICAS Lost & Found System</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Segoe+UI:wght@300;400;600&display=swap');
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Inter;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#0a0f2c;
-    overflow:hidden;
-    color:white;
-}
+/* BACKGROUND — same as dashboard */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #e6edf3;
+    overflow: hidden;
 
-/* GRID BACKGROUND */
-body::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
     background:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size:50px 50px;
-    animation: move 20s linear infinite;
-    z-index:-1;
+        radial-gradient(circle at 20% 20%, rgba(0,255,255,0.08), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0,150,255,0.08), transparent 40%),
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+        url('assets/img/ICAS.webp');
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
-@keyframes move{
-    0%{transform:translate(0,0);}
-    100%{transform:translate(-50px,-50px);}
+/* SCHOOL NAME BANNER */
+.school-banner {
+    text-align: center;
+    margin-bottom: 250px;
 }
 
-/* CONTAINER */
-.container{
-    width:90%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.school-banner h1 {
+    font-family: Orbitron, sans-serif;
+    color: #38bdf8;
+    font-size: 1.3em;
+    letter-spacing: 2px;
+    text-shadow: 0 0 12px rgba(56,189,248,0.6);
+}
+
+/* LEFT + BOX WRAPPER */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    width: 90%;
+    max-width: 900px;
 }
 
 /* LEFT SIDE */
-.left{
-    width:50%;
+.left {
+    flex: 5;
 }
 
-.left h1{
-    font-family:Orbitron;
-    color:#00e5ff;
-    font-size:38px;
+.left h1 {
+    font-family: Orbitron, sans-serif;
+    color: #38bdf8;
+    font-size: 2em;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(56,189,248,0.6);
+    line-height: 1.3;
 }
 
-.left p{
-    color:#aaa;
-    margin-top:10px;
+.left p {
+    color: #94a3b8;
+    margin-top: 12px;
+    font-size: 0.95em;
 }
 
-/* LOGIN BOX */
-.box{
-    width:400px;
-    background:rgba(255,255,255,0.08);
-    padding:30px;
-    border-radius:15px;
-    backdrop-filter:blur(12px);
-    box-shadow:0 0 20px rgba(0,229,255,0.3);
+/* LOGIN BOX — glass card matching dashboard style */
+.box {
+    width: 380px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 35px 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(56,189,248,0.2);
+    box-shadow:
+        0 0 25px rgba(0, 191, 255, 0.25),
+        0 20px 50px rgba(0,0,0,0.5);
 }
 
-input{
-    width:100%;
-    padding:12px;
-    margin:10px 0;
-    border:none;
-    border-radius:8px;
-    background:rgba(255,255,255,0.1);
-    color:white;
+.box h2 {
+    color: #38bdf8;
+    font-family: Orbitron, sans-serif;
+    font-size: 1.2em;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px rgba(56,189,248,0.5);
 }
 
-button{
-    width:100%;
-    padding:12px;
-    background:#00e5ff;
-    border:none;
-    border-radius:8px;
-    font-weight:bold;
-    cursor:pointer;
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(56,189,248,0.3);
+    background: #020617;
+    color: #e6edf3;
+    font-size: 0.95em;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.error{
-    background:red;
-    padding:8px;
-    margin:10px 0;
-    border-radius:6px;
-    text-align:center;
+input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56,189,248,0.3);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #38bdf8;
+    box-shadow: 0 0 14px rgba(56,189,248,0.6);
+}
+
+/* ERROR / SUCCESS */
+.error {
+    background: rgba(239,68,68,0.2);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.success {
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.4);
+    color: #38bdf8;
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9em;
 }
 
 /* MODAL */
-.modal{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.8);
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    z-index: 999;
 }
 
-.modal-content{
-    width:350px;
-    margin:10% auto;
-    background:rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:12px;
-    backdrop-filter:blur(12px);
+.modal-content {
+    background: #0f172a;
+    color: #e6edf3;
+    width: 380px;
+    margin: 8% auto;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid rgba(56,189,248,0.3);
+    box-shadow: 0 0 20px rgba(56,189,248,0.2);
 }
 
-.close{
-    float:right;
-    cursor:pointer;
-    color:#00e5ff;
+.modal-content h3 {
+    color: #38bdf8;
+    font-family: Orbitron, sans-serif;
+    font-size: 1em;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
 }
 
-/* SUCCESS MESSAGE */
-.success{
-    color:#00e5ff;
-    text-align:center;
-    margin:10px 0;
+.close {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+    color: #38bdf8;
+    line-height: 1;
+}
+
+.close:hover {
+    color: #7dd3fc;
+}
+
+/* REGISTER LINK */
+.register-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.88em;
+    color: #94a3b8;
+}
+
+.register-link a {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.register-link a:hover {
+    text-shadow: 0 0 8px rgba(56,189,248,0.5);
 }
 </style>
 
 </head>
 
 <body>
-<div style="position:absolute; top:20px; width:100%; text-align:center;">
-<h1 style="font-family:Orbitron;color:#00e5ff;">
-INABANGA COLLEGE OF ARTS AND SCIENCES (ICAS)
-</h1>
-</div>
-<div class="container">
-        
-    <!-- LEFT -->
-    <div class="left">
-        <h1>LOST AND FOUND INVENTORY SYSTEM</h1>
-        <p>ICAS - Lost & Found Tracking System</p>
+
+    <!-- SCHOOL BANNER -->
+    <div class="school-banner">
+        <h1>INABANGA COLLEGE OF ARTS AND SCIENCES (ICAS)</h1>
     </div>
 
-    <!-- LOGIN BOX -->
-    <div class="box">
+    <div class="container">
 
-        <h2>LOGIN</h2>
+        <!-- LEFT -->
+        <div class="left">
+            <h1>LOST AND FOUND INVENTORY SYSTEM</h1>
+            <p>ICAS — Lost &amp; Found Tracking System</p>
+        </div>
 
-        <?php if(isset($error)) echo "<div class='error'>$error</div>"; ?>
+        <!-- LOGIN BOX -->
+        <div class="box">
 
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button name="login">Login</button>
-        </form>
+            <h2>LOGIN</h2>
 
-        
-       
+            <?php if(isset($error)) echo "<div class='error'>$error</div>"; ?>
+            <?php if(isset($register_success)) echo "<div class='success'>$register_success</div>"; ?>
+
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button name="login">Login</button>
+            </form>
+
+            <div class="register-link">
+                Don't have an account? <a onclick="document.getElementById('registerModal').style.display='block'">Register</a>
+            </div>
+
+        </div>
+
     </div>
 
-</div>
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
+            <h3>REGISTER</h3>
 
+            <?php if(isset($register_error)) echo "<div class='error'>$register_error</div>"; ?>
+
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button name="register">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-open modal if there was a register error
+        <?php if(isset($register_error)): ?>
+        document.getElementById('registerModal').style.display = 'block';
+        <?php endif; ?>
+    </script>
+
+</body>
+</html>

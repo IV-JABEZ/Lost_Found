@@ -2,366 +2,204 @@
 session_start();
 include "includes/db.php";
 
-
 if (isset($_POST['login'])) {
-
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-
     $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
-
         $user = $result->fetch_assoc();
-
         if (password_verify($password, $user['password'])) {
-
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
-
             header("Location: dashboard.php");
             exit();
-
         } else {
-            $error = "Invalid password!";
+            $error = "Invalid password.";
         }
-
     } else {
-        $error = "User not found!";
+        $error = "No account found with that username.";
     }
 }
 
-/* modal */
-if (isset($_POST['register'])) {
-
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    if (empty($username) || empty($password)) {
-
-        $register_error = "All fields are required!";
-
-    } else {
-
-        // check duplicate user
-        $check = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
-        $check->bind_param("s", $username);
-        $check->execute();
-        $check->store_result();
-
-        if ($check->num_rows > 0) {
-
-            $register_error = "Username already exists!";
-
-        } else {
-
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
-
-            $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-            $stmt->bind_param("ss", $username, $hashed);
-
-            if ($stmt->execute()) {
-
-                $register_success = "Account registered successfully! You can now login.";
-
-            } else {
-                $register_error = "Registration failed!";
-            }
-        }
-    }
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ICAS Lost & Found System</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICAS — Lost &amp; Found</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Segoe+UI:wght@300;400;600&display=swap');
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
+:root {
+    --bg:        #f5f5f3;
+    --surface:   #ffffff;
+    --border:    rgba(0,0,0,0.10);
+    --text:      #1a1a1a;
+    --muted:     #6b7280;
+    --accent:    #1a1a1a;
+    --radius:    10px;
+    --danger-bg: #fef2f2;
+    --danger:    #b91c1c;
+    --ok-bg:     #f0fdf4;
+    --ok:        #15803d;
 }
 
-/* BACKGROUND — same as dashboard */
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    color: #e6edf3;
-    overflow: hidden;
-
+    justify-content: center;
     background:
-        radial-gradient(circle at 20% 20%, rgba(0,255,255,0.08), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0,150,255,0.08), transparent 40%),
-        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
-        url('assets/img/ICAS.webp');
-
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+        url('assets/img/ICAS.webp') center/cover no-repeat fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    padding: 1.5rem;
 }
 
-/* SCHOOL NAME BANNER */
-.school-banner {
+.school {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 2rem;
     text-align: center;
-    margin-bottom: 250px;
 }
 
-.school-banner h1 {
-    font-family: Orbitron, sans-serif;
-    color: #38bdf8;
-    font-size: 1.3em;
-    letter-spacing: 2px;
-    text-shadow: 0 0 12px rgba(56,189,248,0.6);
-}
-
-/* LEFT + BOX WRAPPER */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 60px;
-    width: 90%;
-    max-width: 900px;
-}
-
-/* LEFT SIDE */
-.left {
-    flex: 5;
-}
-
-.left h1 {
-    font-family: Orbitron, sans-serif;
-    color: #38bdf8;
-    font-size: 2em;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(56,189,248,0.6);
-    line-height: 1.3;
-}
-
-.left p {
-    color: #94a3b8;
-    margin-top: 12px;
-    font-size: 0.95em;
-}
-
-/* LOGIN BOX — glass card matching dashboard style */
-.box {
-    width: 380px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(10px);
-    padding: 35px 30px;
-    border-radius: 20px;
-    border: 1px solid rgba(56,189,248,0.2);
-    box-shadow:
-        0 0 25px rgba(0, 191, 255, 0.25),
-        0 20px 50px rgba(0,0,0,0.5);
-}
-
-.box h2 {
-    color: #38bdf8;
-    font-family: Orbitron, sans-serif;
-    font-size: 1.2em;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-shadow: 0 0 8px rgba(56,189,248,0.5);
-}
-
-input {
+.card {
+    background: rgba(10, 25, 60, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    padding: 2rem;
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid rgba(56,189,248,0.3);
-    background: #020617;
-    color: #e6edf3;
-    font-size: 0.95em;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    max-width: 360px;
 }
 
-input:focus {
-    border-color: #38bdf8;
-    box-shadow: 0 0 8px rgba(56,189,248,0.3);
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    background: #0ea5e9;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 1em;
-    cursor: pointer;
-    transition: 0.3s;
+.card-tag {
+    display: inline-block;
+    font-size: 11px;
     letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 5px;
+    padding: 2px 8px;
+    margin-bottom: 1rem;
 }
 
-button:hover {
-    background: #38bdf8;
-    box-shadow: 0 0 14px rgba(56,189,248,0.6);
-}
-
-/* ERROR / SUCCESS */
-.error {
-    background: rgba(239,68,68,0.2);
-    border: 1px solid #ef4444;
-    color: #fca5a5;
-    padding: 8px 12px;
-    margin: 10px 0;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.9em;
-}
-
-.success {
-    background: rgba(56,189,248,0.1);
-    border: 1px solid rgba(56,189,248,0.4);
-    color: #38bdf8;
-    padding: 8px 12px;
-    margin: 10px 0;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.9em;
-}
-
-/* MODAL */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.75);
-    z-index: 999;
-}
-
-.modal-content {
-    background: #0f172a;
-    color: #e6edf3;
-    width: 380px;
-    margin: 8% auto;
-    padding: 30px;
-    border-radius: 15px;
-    border: 1px solid rgba(56,189,248,0.3);
-    box-shadow: 0 0 20px rgba(56,189,248,0.2);
-}
-
-.modal-content h3 {
-    color: #38bdf8;
-    font-family: Orbitron, sans-serif;
-    font-size: 1em;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-}
-
-.close {
-    float: right;
-    font-size: 22px;
-    cursor: pointer;
-    color: #38bdf8;
-    line-height: 1;
-}
-
-.close:hover {
-    color: #7dd3fc;
-}
-
-/* REGISTER LINK */
-.register-link {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 0.88em;
-    color: #94a3b8;
-}
-
-.register-link a {
-    color: #38bdf8;
-    text-decoration: none;
+.card h1 {
+    font-size: 20px;
     font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+.card > p {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+}
+
+.field { margin-bottom: 12px; }
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 5px;
+}
+
+.field input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: calc(var(--radius) - 2px);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.field input::placeholder { color: rgba(255,255,255,0.3); }
+.field input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); }
+
+.btn {
+    width: 100%;
+    height: 38px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.2s;
 }
 
-.register-link a:hover {
-    text-shadow: 0 0 8px rgba(56,189,248,0.5);
+.btn:hover { background: rgba(255,255,255,0.25); }
+
+.msg {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: calc(var(--radius) - 2px);
+    margin-bottom: 12px;
+    border: 1px solid;
 }
+
+.msg.error {
+    background: rgba(185,28,28,0.25);
+    color: #fca5a5;
+    border-color: rgba(239,68,68,0.4);
+}
+
+.msg.success {
+    background: rgba(21,128,61,0.25);
+    color: #86efac;
+    border-color: rgba(34,197,94,0.4);
+}
+
 </style>
-
 </head>
-
 <body>
 
-    <!-- SCHOOL BANNER -->
-    <div class="school-banner">
-        <h1>INABANGA COLLEGE OF ARTS AND SCIENCES (ICAS)</h1>
-    </div>
+<p class="school">Inabanga College of Arts and Sciences</p>
 
-    <div class="container">
+<div class="card">
+    <span class="card-tag">Lost &amp; Found System</span>
+    <h1>Sign in</h1>
+    <p>Enter your credentials to continue.</p>
 
-        <!-- LEFT -->
-        <div class="left">
-            <h1>LOST AND FOUND INVENTORY SYSTEM</h1>
-            <p>ICAS — Lost &amp; Found Tracking System</p>
+    <?php if (isset($error)): ?>
+        <div class="msg error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+<form method="POST">
+        <div class="field">
+            <label for="login-user">Username</label>
+            <input id="login-user" type="text" name="username" placeholder="your_username" required autocomplete="username">
         </div>
-
-        <!-- LOGIN BOX -->
-        <div class="box">
-
-            <h2>LOGIN</h2>
-
-            <?php if(isset($error)) echo "<div class='error'>$error</div>"; ?>
-            <?php if(isset($register_success)) echo "<div class='success'>$register_success</div>"; ?>
-
-            <form method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button name="login">Login</button>
-            </form>
-
-            <div class="register-link">
-                Don't have an account? <a onclick="document.getElementById('registerModal').style.display='block'">Register</a>
-            </div>
-
+        <div class="field">
+            <label for="login-pass">Password</label>
+            <input id="login-pass" type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
         </div>
+        <button class="btn" name="login">Sign in</button>
+    </form>
 
-    </div>
-
-    <!-- REGISTER MODAL -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <span class="close" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
-            <h3>REGISTER</h3>
-
-            <?php if(isset($register_error)) echo "<div class='error'>$register_error</div>"; ?>
-
-            <form method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button name="register">Register</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Auto-open modal if there was a register error
-        <?php if(isset($register_error)): ?>
-        document.getElementById('registerModal').style.display = 'block';
-        <?php endif; ?>
-    </script>
+</div>
 
 </body>
 </html>

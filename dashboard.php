@@ -2,6 +2,19 @@
 include 'includes/db.php';
 session_start();
 
+
+// Redirect to login if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+// Prevent browser from caching this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+
 /* ===================== HANDLE UPDATE ===================== */
 if (isset($_POST['update'])) {
 
@@ -65,6 +78,13 @@ $filteredTotal = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FR
 $totalPages    = ceil($filteredTotal / $limit);
 
 $result = mysqli_query($conn, "SELECT * FROM items $whereClause ORDER BY id ASC LIMIT $limit OFFSET $offset");
+
+/* ===================== FETCH ALL FOR PRINT ===================== */
+$printResult = mysqli_query($conn, "SELECT * FROM items $whereClause ORDER BY id ASC");
+$printRows = [];
+while ($r = mysqli_fetch_assoc($printResult)) {
+    $printRows[] = $r;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -211,9 +231,16 @@ body {
     text-shadow:0 0 8px rgba(56,189,248,0.5);
 }
 
-.add-btn {
+/* Header right-side button group */
+.header-actions {
     position:absolute;
     right:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.add-btn {
     width:42px; height:42px;
     background:#0ea5e9;
     color:white;
@@ -230,6 +257,31 @@ body {
     transform:rotate(90deg) scale(1.1);
 }
 
+/* Print Button */
+.print-btn {
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:9px 16px;
+    background:rgba(16,185,129,0.15);
+    color:#34d399;
+    border:1px solid rgba(52,211,153,0.4);
+    border-radius:10px;
+    font-size:0.82em;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:0.3s;
+    text-decoration:none;
+}
+.print-btn:hover {
+    background:rgba(16,185,129,0.28);
+    border-color:#34d399;
+    box-shadow:0 0 12px rgba(52,211,153,0.4);
+    color:#6ee7b7;
+}
+
 .table-container { padding:20px; }
 
 table { width:100%; border-collapse:collapse; color:#e6edf3; }
@@ -237,13 +289,28 @@ table { width:100%; border-collapse:collapse; color:#e6edf3; }
 th {
     background:#020617;
     color:#38bdf8;
-    padding:12px;
+    padding:12px 10px;
     text-transform:uppercase;
     font-size:12px;
     letter-spacing:1px;
     font-family:Orbitron,sans-serif;
+    text-align:center;
+    white-space:nowrap;
 }
-td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.07); vertical-align:middle; }
+
+td {
+    padding:12px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    vertical-align:middle;
+    text-align:center;
+}
+
+/* Left-align text-heavy columns */
+td:nth-child(3), /* Name */
+td:nth-child(5)  /* Location */ {
+    text-align:left;
+}
+
 tr:hover { background:rgba(56,189,248,0.06); }
 
 .item-img {
@@ -273,7 +340,7 @@ tr:hover { background:rgba(56,189,248,0.06); }
 .badge-claimed   { background:rgba(167,139,250,0.2); color:#c4b5fd; border:1px solid #a78bfa; }
 .badge-unclaimed { background:rgba(251,191,36,0.2);  color:#fde68a; border:1px solid #fbbf24; }
 
-.actions { display:flex; gap:8px; }
+.actions { display:flex; gap:8px; justify-content:center; }
 .icon-btn {
     width:36px; height:36px;
     display:flex; align-items:center; justify-content:center;
@@ -305,6 +372,12 @@ tr:hover { background:rgba(56,189,248,0.06); }
 .pagination a:hover, .pagination a.active {
     background:#0ea5e9; border-color:#0ea5e9; color:white;
     box-shadow:0 0 8px rgba(14,165,233,0.5);
+}
+.pagination .page-info {
+    display:inline-block;
+    padding:7px 13px;
+    color:#64748b;
+    font-size:13px;
 }
 
 /* LOGOUT */
@@ -382,9 +455,7 @@ tr:hover { background:rgba(56,189,248,0.06); }
 .close:hover { color:#7dd3fc; box-shadow:none; background:none; }
 
 /* FORM FIELDS */
-.form-group {
-    margin-bottom:14px;
-}
+.form-group { margin-bottom:14px; }
 
 .form-group label {
     display:block;
@@ -422,11 +493,7 @@ tr:hover { background:rgba(56,189,248,0.06); }
     gap:14px;
 }
 
-/* CURRENT IMAGE PREVIEW */
-.current-img-wrap {
-    margin-bottom:14px;
-}
-
+.current-img-wrap { margin-bottom:14px; }
 .current-img-wrap label {
     display:block;
     font-size:0.78em;
@@ -436,7 +503,6 @@ tr:hover { background:rgba(56,189,248,0.06); }
     margin-bottom:8px;
     font-weight:600;
 }
-
 .current-img-wrap img {
     width:100%;
     height:160px;
@@ -445,12 +511,7 @@ tr:hover { background:rgba(56,189,248,0.06); }
     border:1px solid rgba(56,189,248,0.3);
 }
 
-/* MODAL BUTTONS */
-.modal-actions {
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-}
+.modal-actions { display:flex; gap:10px; margin-top:20px; }
 
 .btn-update {
     flex:1;
@@ -513,9 +574,199 @@ tr:hover { background:rgba(56,189,248,0.06); }
     color:white;
     text-align:right;
 }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    body {
+        background: white !important;
+        color: #111 !important;
+        padding: 0 !important;
+        font-size: 13px;
+    }
+
+    /* Hide everything except the print section */
+    .title, .stats-grid, .filter-bar, .container,
+    .modal, .logout, .add-btn, .print-btn,
+    .header-actions { display: none !important; }
+
+    #printSection { display: block !important; }
+
+    #printSection table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    #printSection th {
+        background: #0f172a !important;
+        color: white !important;
+        padding: 9px 8px;
+        text-align: center;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    #printSection td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #printSection td:nth-child(3),
+    #printSection td:nth-child(5) { text-align: left; }
+
+    #printSection tr:nth-child(even) td {
+        background: #f8fafc;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .print-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid currentColor;
+    }
+
+    .print-badge-lost      { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+    .print-badge-found     { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
+    .print-badge-claimed   { color: #7c3aed; border-color: #7c3aed; background: #f5f3ff; }
+    .print-badge-unclaimed { color: #b45309; border-color: #b45309; background: #fffbeb; }
+
+    .print-header {
+        text-align: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #0f172a;
+    }
+
+    .print-header h1 {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+        color: #0f172a;
+    }
+
+    .print-header p { font-size: 12px; color: #475569; }
+
+    .print-stats {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .print-stat {
+        flex: 1;
+        min-width: 100px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .print-stat .ps-num  { font-size: 20px; font-weight: 800; }
+    .print-stat .ps-label{ font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; }
+
+    .print-footer {
+        margin-top: 18px;
+        font-size: 11px;
+        color: #94a3b8;
+        text-align: right;
+    }
+
+    /* Page breaks every 25 rows to prevent overflow */
+    #printSection tr:nth-child(25n) { page-break-after: always; }
+}
 </style>
 </head>
 <body>
+
+<!-- ===== PRINT SECTION (hidden on screen, shown on print) ===== -->
+<div id="printSection" style="display:none;">
+    <div class="print-header">
+        <h1>LOST &amp; FOUND INVENTORY SYSTEM</h1>
+        <p>
+            <?php
+                $label = $filter ? ucfirst($filter) . ' Items' : 'All Items';
+                echo htmlspecialchars($label) . ' &mdash; ' . $filteredTotal . ' record' . ($filteredTotal != 1 ? 's' : '');
+            ?>
+            &nbsp;|&nbsp; Printed: <?= date('F j, Y  g:i A') ?>
+        </p>
+    </div>
+
+    <div class="print-stats">
+        <div class="print-stat" style="border-color:#38bdf8;">
+            <div class="ps-num" style="color:#0284c7;"><?= $totalItems ?></div>
+            <div class="ps-label">Total Items</div>
+        </div>
+        <div class="print-stat" style="border-color:#ef4444;">
+            <div class="ps-num" style="color:#dc2626;"><?= $totalLost ?></div>
+            <div class="ps-label">Lost</div>
+        </div>
+        <div class="print-stat" style="border-color:#22c55e;">
+            <div class="ps-num" style="color:#16a34a;"><?= $totalFound ?></div>
+            <div class="ps-label">Found</div>
+        </div>
+        <div class="print-stat" style="border-color:#a78bfa;">
+            <div class="ps-num" style="color:#7c3aed;"><?= $totalClaimed ?></div>
+            <div class="ps-label">Claimed</div>
+        </div>
+        <div class="print-stat" style="border-color:#fbbf24;">
+            <div class="ps-num" style="color:#b45309;"><?= $totalUnclaimed ?></div>
+            <div class="ps-label">Unclaimed</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item Name</th>
+                <th>Date Found</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($printRows as $pr): ?>
+            <?php $lf = strtolower($pr['lost_found']); $st = strtolower($pr['status']); ?>
+            <tr>
+                <td>#<?= $pr['id'] ?></td>
+                <td style="text-align:left;"><?= htmlspecialchars($pr['item_name']) ?></td>
+                <td><?= htmlspecialchars($pr['date_found']) ?></td>
+                <td style="text-align:left;"><?= htmlspecialchars($pr['location']) ?></td>
+                <td>
+                    <span class="print-badge <?= $lf==='lost' ? 'print-badge-lost' : 'print-badge-found' ?>">
+                        <?= htmlspecialchars($pr['lost_found']) ?>
+                    </span>
+                </td>
+                <td>
+                    <span class="print-badge <?= $st==='claimed' ? 'print-badge-claimed' : 'print-badge-unclaimed' ?>">
+                        <?= htmlspecialchars($pr['status']) ?>
+                    </span>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <div class="print-footer">
+        Generated by Lost &amp; Found Inventory System &mdash; <?= date('Y') ?>
+    </div>
+</div>
+<!-- END PRINT SECTION -->
+
 
 <div class="title">LOST & FOUND INVENTORY SYSTEM</div>
 
@@ -562,9 +813,16 @@ tr:hover { background:rgba(56,189,248,0.06); }
 
     <div class="header">
         <h2>ITEM RECORDS</h2>
-        <a href="#" class="add-btn" onclick="openAddModal(); return false;" title="Add Item">
-            <i class="fas fa-plus"></i>
-        </a>
+        <div class="header-actions">
+            <!-- PRINT BUTTON -->
+            <a href="#" class="print-btn" onclick="printData(); return false;" title="Print all records">
+                <i class="fas fa-print"></i> Print Records
+            </a>
+            <!-- ADD BUTTON -->
+            <a href="#" class="add-btn" onclick="openAddModal(); return false;" title="Add Item">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
     </div>
 
     <div class="table-container">
@@ -573,8 +831,8 @@ tr:hover { background:rgba(56,189,248,0.06); }
                 <tr>
                     <th>ID</th>
                     <th>Image</th>
-                    <th>Name</th>
-                    <th>Date</th>
+                    <th>Item Name</th>
+                    <th>Date Found</th>
                     <th>Location</th>
                     <th>Type</th>
                     <th>Status</th>
@@ -594,9 +852,9 @@ tr:hover { background:rgba(56,189,248,0.06); }
                                 title="Click to enlarge"
                             >
                         </td>
-                        <td><?= htmlspecialchars($row['item_name']) ?></td>
+                        <td style="text-align:left;"><?= htmlspecialchars($row['item_name']) ?></td>
                         <td><?= htmlspecialchars($row['date_found']) ?></td>
-                        <td><?= htmlspecialchars($row['location']) ?></td>
+                        <td style="text-align:left;"><?= htmlspecialchars($row['location']) ?></td>
                         <td>
                             <?php $lf = strtolower($row['lost_found']); ?>
                             <span class="badge <?= $lf==='lost' ? 'badge-lost' : 'badge-found' ?>">
@@ -611,7 +869,6 @@ tr:hover { background:rgba(56,189,248,0.06); }
                         </td>
                         <td>
                             <div class="actions">
-                                <!-- EDIT BUTTON — passes data to modal via JS -->
                                 <button class="icon-btn editBtn" title="Edit"
                                     onclick="openEditModal(
                                         <?= $row['id'] ?>,
@@ -651,12 +908,28 @@ tr:hover { background:rgba(56,189,248,0.06); }
             <?php if($page > 1): ?>
                 <a href="?filter=<?= $filter ?>&page=<?= $page-1 ?>"><i class="fas fa-chevron-left"></i> Prev</a>
             <?php endif; ?>
-            <?php for($i=1; $i<=$totalPages; $i++): ?>
-                <a class="<?= ($i==$page) ? 'active' : '' ?>" href="?filter=<?= $filter ?>&page=<?= $i ?>"><?= $i ?></a>
-            <?php endfor; ?>
+
+            <?php
+            // Show max 7 page links with ellipsis for large sets
+            $range = 2;
+            for($i = 1; $i <= $totalPages; $i++):
+                if ($i === 1 || $i === $totalPages || ($i >= $page - $range && $i <= $page + $range)):
+            ?>
+                <a class="<?= ($i == $page) ? 'active' : '' ?>" href="?filter=<?= $filter ?>&page=<?= $i ?>"><?= $i ?></a>
+            <?php
+                elseif ($i === $page - $range - 1 || $i === $page + $range + 1):
+            ?>
+                <span class="page-info">&hellip;</span>
+            <?php
+                endif;
+            endfor;
+            ?>
+
             <?php if($page < $totalPages): ?>
                 <a href="?filter=<?= $filter ?>&page=<?= $page+1 ?>">Next <i class="fas fa-chevron-right"></i></a>
             <?php endif; ?>
+
+            <span class="page-info">Page <?= $page ?> of <?= $totalPages ?></span>
         </div>
         <?php endif; ?>
 
@@ -793,6 +1066,17 @@ tr:hover { background:rgba(56,189,248,0.06); }
 
 
 <script>
+/* ===== PRINT FUNCTION ===== */
+function printData() {
+    document.getElementById('printSection').style.display = 'block';
+    window.print();
+    // Hide again after print dialog closes
+    setTimeout(function() {
+        document.getElementById('printSection').style.display = 'none';
+    }, 1000);
+}
+
+/* ===== EDIT MODAL ===== */
 function openEditModal(id, name, date, location, type, status, imgSrc) {
     document.getElementById('edit_id').value       = id;
     document.getElementById('edit_name').value     = name;
@@ -800,7 +1084,6 @@ function openEditModal(id, name, date, location, type, status, imgSrc) {
     document.getElementById('edit_location').value = location;
     document.getElementById('edit_img_preview').src = imgSrc;
 
-    // Set select values
     const typeSelect   = document.getElementById('edit_type');
     const statusSelect = document.getElementById('edit_status');
     for (let opt of typeSelect.options)   opt.selected = (opt.value === type);

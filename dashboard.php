@@ -331,60 +331,73 @@ td {
 /* ===================== COLUMN ALIGNMENTS ===================== */
 
 /* ID COLUMN */
-td:nth-child(1) {
-    text-align:center;
-    font-weight:600;
-    white-space:nowrap;
+td {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    vertical-align: middle;
+    text-align: center !important;
+    font-size: 15px;
+    font-weight: 500;
+    color: #f1f5f9;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
-/* IMAGE COLUMN */
-td:nth-child(2) {
-    text-align:center;
+/* CENTER ALL COLUMNS */
+table th,
+table td {
+    text-align: center !important;
+    vertical-align: middle !important;
 }
 
-/* ITEM NAME COLUMN */
-td:nth-child(3) {
-    text-align:left;
-    padding-left:18px;
-    font-weight:500;
-}
-
-/* DATE COLUMN */
-td:nth-child(4) {
-    text-align:center;
-    white-space:nowrap;
-}
-
-/* LOCATION COLUMN */
+/* REMOVE LEFT ALIGN */
+td:nth-child(3),
 td:nth-child(5) {
-    text-align:left;
-    padding-left:18px;
+    text-align: center !important;
 }
 
-/* TYPE COLUMN */
-td:nth-child(6) {
-    text-align:center;
+/* BETTER TABLE LOOK */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
-/* STATUS COLUMN */
-td:nth-child(7) {
-    text-align:center;
+/* COLUMN WIDTHS */
+th:nth-child(1), td:nth-child(1) { width: 70px; }
+th:nth-child(2), td:nth-child(2) { width: 100px; }
+th:nth-child(3), td:nth-child(3) { width: 220px; }
+th:nth-child(4), td:nth-child(4) { width: 160px; }
+th:nth-child(5), td:nth-child(5) { width: 220px; }
+th:nth-child(6), td:nth-child(6) { width: 130px; }
+th:nth-child(7), td:nth-child(7) { width: 150px; }
+th:nth-child(8), td:nth-child(8) { width: 140px; }
+
+/* HEADER ENHANCEMENT */
+th {
+    background: #020617;
+    color: #38bdf8;
+    padding: 15px 12px;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+    font-family: Orbitron, sans-serif;
+    text-align: center !important;
+    white-space: nowrap;
 }
 
-/* ACTION COLUMN */
-td:nth-child(8) {
-    text-align:center;
+/* ACTION BUTTON CENTER */
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-/* ===================== ROW HOVER EFFECT ===================== */
-
-tbody tr {
-    transition:0.3s ease;
-}
-
-tbody tr:hover {
-    background:rgba(56,189,248,0.06);
-    transform:scale(1.002);
+/* IMAGE CENTER */
+.item-img {
+    display: block;
+    margin: auto;
 }
 
 /* ===================== IMAGE STYLE ===================== */

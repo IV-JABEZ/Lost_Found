@@ -691,113 +691,197 @@ tbody tr:hover {
 }
 
 /* ===== PRINT STYLES ===== */
+/* ===== PRINT STYLES ===== */
 @media print {
+
     body {
-        background: white !important;
-        color: #111 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: Arial, sans-serif !important;
         padding: 0 !important;
-        font-size: 13px;
+        margin: 0 !important;
+        zoom: 100%;
     }
 
-    /* Hide everything except the print section */
-    .title, .stats-grid, .filter-bar, .container,
-    .modal, .logout, .add-btn, .print-btn,
-    .header-actions { display: none !important; }
+    /* HIDE UNNECESSARY ELEMENTS */
+    .title,
+    .stats-grid,
+    .filter-bar,
+    .container,
+    .modal,
+    .logout,
+    .add-btn,
+    .print-btn,
+    .header-actions,
+    .header,
+    nav,
+    footer {
+        display: none !important;
+    }
 
-    #printSection { display: block !important; }
-
-    #printSection table {
+    /* SHOW PRINT SECTION ONLY */
+    #printSection {
+        display: block !important;
         width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
+        padding: 20px;
+        color: #000 !important;
     }
 
-    #printSection th {
-        background: #0f172a !important;
-        color: white !important;
-        padding: 9px 8px;
-        text-align: center;
-        font-size: 11px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+    /* REMOVE DEFAULT BROWSER HEADER */
+    @page {
+        size: auto;
+        margin: 12mm;
     }
 
-    #printSection td {
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    #printSection td:nth-child(3),
-    #printSection td:nth-child(5) { text-align: left; }
-
-    #printSection tr:nth-child(even) td {
-        background: #f8fafc;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .print-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 700;
-        border: 1px solid currentColor;
-    }
-
-    .print-badge-lost      { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
-    .print-badge-found     { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
-    .print-badge-claimed   { color: #7c3aed; border-color: #7c3aed; background: #f5f3ff; }
-    .print-badge-unclaimed { color: #b45309; border-color: #b45309; background: #fffbeb; }
-
+    /* PRINT HEADER */
     .print-header {
         text-align: center;
-        margin-bottom: 18px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #0f172a;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 12px;
     }
 
     .print-header h1 {
-        font-size: 18px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        margin-bottom: 4px;
-        color: #0f172a;
+        font-size: 24px;
+        color: #000 !important;
+        font-weight: bold;
+        margin-bottom: 5px;
+        letter-spacing: 1px;
     }
 
-    .print-header p { font-size: 12px; color: #475569; }
+    .print-header p {
+        font-size: 13px;
+        color: #000 !important;
+        margin: 0;
+        font-weight: 500;
+    }
 
+    /* STAT BOXES */
     .print-stats {
         display: flex;
-        gap: 14px;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
     .print-stat {
         flex: 1;
-        min-width: 100px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
+        border: 1px solid #000;
+        border-radius: 6px;
         padding: 10px;
         text-align: center;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        background: #fff !important;
     }
 
-    .print-stat .ps-num  { font-size: 20px; font-weight: 800; }
-    .print-stat .ps-label{ font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; }
+    .print-stat .ps-num {
+        font-size: 22px;
+        font-weight: bold;
+        color: #000 !important;
+    }
 
-    .print-footer {
-        margin-top: 18px;
+    .print-stat .ps-label {
         font-size: 11px;
-        color: #94a3b8;
-        text-align: right;
+        color: #000 !important;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
+
+    /* TABLE */
+    #printSection table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #000 !important;
+    }
+
+    #printSection th {
+        background: #000 !important;
+        color: #fff !important;
+        border: 1px solid #000;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    #printSection td {
+        border: 1px solid #000;
+        padding: 10px;
+        color: #000 !important;
+        font-weight: 500;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    /* COLUMN ALIGNMENT */
+    #printSection td:nth-child(1),
+    #printSection th:nth-child(1) {
+        width: 8%;
+        text-align: center;
+    }
+
+    #printSection td:nth-child(2),
+    #printSection th:nth-child(2) {
+        width: 25%;
+        text-align: left;
+        padding-left: 12px;
+    }
+
+    #printSection td:nth-child(3),
+    #printSection th:nth-child(3) {
+        width: 18%;
+        text-align: center;
+    }
+
+    #printSection td:nth-child(4),
+    #printSection th:nth-child(4) {
+        width: 25%;
+        text-align: left;
+        padding-left: 12px;
+    }
+
+    #printSection td:nth-child(5),
+    #printSection th:nth-child(5) {
+        width: 12%;
+        text-align: center;
+    }
+
+    #printSection td:nth-child(6),
+    #printSection th:nth-child(6) {
+        width: 12%;
+        text-align: center;
+    }
+
+    /* BADGES */
+    .print-badge,
+    .print-badge-lost,
+    .print-badge-found,
+    .print-badge-claimed,
+    .print-badge-unclaimed {
+        background: transparent !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    /* FOOTER */
+    .print-footer {
+        margin-top: 20px;
+        text-align: right;
+        font-size: 11px;
+        color: #000 !important;
+    }
+
+    /* AVOID PAGE CUTS */
+    tr {
+        page-break-inside: avoid;
+    }
+}
 
     /* Page breaks every 25 rows to prevent overflow */
     #printSection tr:nth-child(25n) { page-break-after: always; }

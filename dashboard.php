@@ -707,16 +707,28 @@ th {
 /* ===== PRINT STYLES ===== */
 @media print {
 
-    body {
+    /* REMOVE BROWSER MARGINS */
+    @page {
+        size: auto;
+        margin: 0;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
         background: #ffffff !important;
-        color: #000000 !important;
-        font-family: Arial, sans-serif !important;
-        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    body {
         margin: 0 !important;
+        padding: 20px !important;
+        color: #000 !important;
+        font-family: Arial, sans-serif;
         zoom: 100%;
     }
 
-    /* HIDE UNNECESSARY ELEMENTS */
+    /* HIDE EVERYTHING EXCEPT PRINT */
     .title,
     .stats-grid,
     .filter-bar,
@@ -725,174 +737,151 @@ th {
     .logout,
     .add-btn,
     .print-btn,
-    .header-actions,
-    .header,
-    nav,
-    footer {
+    .header-actions {
         display: none !important;
     }
 
     /* SHOW PRINT SECTION ONLY */
     #printSection {
         display: block !important;
-        width: 100%;
-        padding: 20px;
-        color: #000 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 20px !important;
+        background: #fff !important;
     }
 
-    /* REMOVE DEFAULT BROWSER HEADER */
-    @page {
-        size: auto;
-        margin: 12mm;
-    }
-
-    /* PRINT HEADER */
+    /* HEADER */
     .print-header {
         text-align: center;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #000;
-        padding-bottom: 12px;
+        margin-bottom: 25px;
+        border-bottom: 3px solid #0f172a;
+        padding-bottom: 15px;
     }
 
     .print-header h1 {
-        font-size: 24px;
-        color: #000 !important;
-        font-weight: bold;
-        margin-bottom: 5px;
-        letter-spacing: 1px;
+        font-size: 34px;
+        color: #0f172a;
+        margin: 0 0 10px;
+        font-weight: 900;
+        letter-spacing: 2px;
     }
 
     .print-header p {
-        font-size: 13px;
-        color: #000 !important;
+        font-size: 18px;
+        color: #444;
         margin: 0;
-        font-weight: 500;
+        font-weight: 600;
     }
 
-    /* STAT BOXES */
+    /* STATS */
     .print-stats {
         display: flex;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 20px;
+        gap: 15px;
+        margin-bottom: 30px;
     }
 
     .print-stat {
         flex: 1;
-        border: 1px solid #000;
-        border-radius: 6px;
-        padding: 10px;
+        border: 2px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 18px;
         text-align: center;
-        background: #fff !important;
+        background: #fff;
     }
 
-    .print-stat .ps-num {
-        font-size: 22px;
+    .ps-num {
+        font-size: 36px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .ps-label {
+        font-size: 15px;
         font-weight: bold;
-        color: #000 !important;
-    }
-
-    .print-stat .ps-label {
-        font-size: 11px;
-        color: #000 !important;
-        margin-top: 4px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        color: #555;
     }
 
     /* TABLE */
     #printSection table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 13px;
-        color: #000 !important;
+        table-layout: fixed;
     }
 
     #printSection th {
-        background: #000 !important;
+        background: #0f172a !important;
         color: #fff !important;
-        border: 1px solid #000;
-        padding: 10px;
+        padding: 16px 10px;
+        font-size: 15px;
+        text-transform: uppercase;
+        border: 1px solid #ddd;
         text-align: center;
-        font-weight: bold;
-        font-size: 12px;
     }
 
     #printSection td {
-        border: 1px solid #000;
-        padding: 10px;
-        color: #000 !important;
-        font-weight: 500;
-        vertical-align: middle;
+        padding: 16px 10px;
+        border: 1px solid #ddd;
+        font-size: 15px;
         text-align: center;
+        color: #111;
+        font-weight: 600;
+        word-wrap: break-word;
     }
 
-    /* COLUMN ALIGNMENT */
-    #printSection td:nth-child(1),
-    #printSection th:nth-child(1) {
-        width: 8%;
-        text-align: center;
-    }
-
-    #printSection td:nth-child(2),
-    #printSection th:nth-child(2) {
-        width: 25%;
-        text-align: left;
-        padding-left: 12px;
-    }
-
-    #printSection td:nth-child(3),
-    #printSection th:nth-child(3) {
-        width: 18%;
-        text-align: center;
-    }
-
-    #printSection td:nth-child(4),
-    #printSection th:nth-child(4) {
-        width: 25%;
-        text-align: left;
-        padding-left: 12px;
-    }
-
-    #printSection td:nth-child(5),
-    #printSection th:nth-child(5) {
-        width: 12%;
-        text-align: center;
-    }
-
-    #printSection td:nth-child(6),
-    #printSection th:nth-child(6) {
-        width: 12%;
-        text-align: center;
+    /* ROW COLORS */
+    #printSection tr:nth-child(even) td {
+        background: #f8fafc !important;
     }
 
     /* BADGES */
-    .print-badge,
-    .print-badge-lost,
-    .print-badge-found,
-    .print-badge-claimed,
-    .print-badge-unclaimed {
-        background: transparent !important;
-        color: #000 !important;
-        border: 1px solid #000 !important;
-        padding: 3px 8px;
-        border-radius: 10px;
-        font-size: 11px;
+    .print-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
         font-weight: bold;
+        border: 2px solid currentColor;
+    }
+
+    .print-badge-lost {
+        color: #dc2626;
+        background: #fee2e2;
+    }
+
+    .print-badge-found {
+        color: #16a34a;
+        background: #dcfce7;
+    }
+
+    .print-badge-claimed {
+        color: #7c3aed;
+        background: #ede9fe;
+    }
+
+    .print-badge-unclaimed {
+        color: #b45309;
+        background: #fef3c7;
     }
 
     /* FOOTER */
     .print-footer {
-        margin-top: 20px;
-        text-align: right;
-        font-size: 11px;
-        color: #000 !important;
+        margin-top: 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        font-weight: 600;
     }
 
-    /* AVOID PAGE CUTS */
-    tr {
-        page-break-inside: avoid;
+    /* REMOVE URL/TITLE FROM PRINT */
+    a[href]:after {
+        content: none !important;
+    }
+
+    title {
+        display: none !important;
     }
 }
 

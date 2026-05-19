@@ -282,65 +282,180 @@ body {
     color:#6ee7b7;
 }
 
-.table-container { padding:20px; }
+/* ===================== TABLE CONTAINER ===================== */
 
-table { width:100%; border-collapse:collapse; color:#e6edf3; }
+.table-container {
+    padding:20px;
+    overflow-x:auto;
+}
+
+/* ===================== TABLE ===================== */
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    color:#e6edf3;
+    table-layout:auto;
+    overflow:hidden;
+    border-radius:12px;
+}
+
+/* ===================== TABLE HEADERS ===================== */
 
 th {
     background:#020617;
     color:#38bdf8;
-    padding:12px 10px;
+    padding:15px 12px;
     text-transform:uppercase;
     font-size:12px;
     letter-spacing:1px;
     font-family:Orbitron,sans-serif;
     text-align:center;
+    vertical-align:middle;
     white-space:nowrap;
+    border-bottom:1px solid rgba(56,189,248,0.25);
 }
 
+/* ===================== TABLE DATA ===================== */
+
 td {
-    padding:12px 10px;
+    padding:14px 12px;
     border-bottom:1px solid rgba(255,255,255,0.07);
     vertical-align:middle;
     text-align:center;
+    font-size:14px;
+    line-height:1.5;
+    transition:0.2s;
 }
 
-/* Left-align text-heavy columns */
-td:nth-child(3), /* Name */
-td:nth-child(5)  /* Location */ {
+/* ===================== COLUMN ALIGNMENTS ===================== */
+
+/* ID COLUMN */
+td:nth-child(1) {
+    text-align:center;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+/* IMAGE COLUMN */
+td:nth-child(2) {
+    text-align:center;
+}
+
+/* ITEM NAME COLUMN */
+td:nth-child(3) {
     text-align:left;
+    padding-left:18px;
+    font-weight:500;
 }
 
-tr:hover { background:rgba(56,189,248,0.06); }
+/* DATE COLUMN */
+td:nth-child(4) {
+    text-align:center;
+    white-space:nowrap;
+}
+
+/* LOCATION COLUMN */
+td:nth-child(5) {
+    text-align:left;
+    padding-left:18px;
+}
+
+/* TYPE COLUMN */
+td:nth-child(6) {
+    text-align:center;
+}
+
+/* STATUS COLUMN */
+td:nth-child(7) {
+    text-align:center;
+}
+
+/* ACTION COLUMN */
+td:nth-child(8) {
+    text-align:center;
+}
+
+/* ===================== ROW HOVER EFFECT ===================== */
+
+tbody tr {
+    transition:0.3s ease;
+}
+
+tbody tr:hover {
+    background:rgba(56,189,248,0.06);
+    transform:scale(1.002);
+}
+
+/* ===================== IMAGE STYLE ===================== */
 
 .item-img {
-    width:58px; height:58px;
+    width:58px;
+    height:58px;
     object-fit:cover;
     border-radius:10px;
     border:1px solid rgba(56,189,248,0.4);
     cursor:pointer;
     transition:0.3s;
+    display:block;
+    margin:auto;
 }
+
 .item-img:hover {
     border-color:#38bdf8;
     box-shadow:0 0 10px rgba(56,189,248,0.5);
     transform:scale(1.08);
 }
 
+/* ===================== BADGES ===================== */
+
 .badge {
-    display:inline-block;
-    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:95px;
+    padding:5px 12px;
     border-radius:20px;
     font-size:12px;
     font-weight:600;
     letter-spacing:0.5px;
+    text-align:center;
 }
-.badge-lost      { background:rgba(239,68,68,0.2);   color:#fca5a5; border:1px solid #ef4444; }
-.badge-found     { background:rgba(34,197,94,0.2);   color:#86efac; border:1px solid #22c55e; }
-.badge-claimed   { background:rgba(167,139,250,0.2); color:#c4b5fd; border:1px solid #a78bfa; }
-.badge-unclaimed { background:rgba(251,191,36,0.2);  color:#fde68a; border:1px solid #fbbf24; }
 
-.actions { display:flex; gap:8px; justify-content:center; }
+/* ===================== ACTION BUTTONS ===================== */
+
+.actions {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width:768px) {
+
+    table {
+        min-width:750px;
+    }
+
+    th,
+    td {
+        padding:10px 8px;
+        font-size:12px;
+    }
+
+    td:nth-child(3),
+    td:nth-child(5) {
+        text-align:center;
+        padding-left:10px;
+    }
+
+    .badge {
+        min-width:auto;
+        padding:4px 10px;
+    }
+}
 .icon-btn {
     width:36px; height:36px;
     display:flex; align-items:center; justify-content:center;
